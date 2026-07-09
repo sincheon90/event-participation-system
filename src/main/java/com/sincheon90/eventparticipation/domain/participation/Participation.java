@@ -1,20 +1,21 @@
-package com.sincheon90.eventparticipation.domain;
+package com.sincheon90.eventparticipation.domain.participation;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Getter
-@NoArgsConstructor
 @Entity
 @Table(
-        name="participation",
+        name = "participation",
         uniqueConstraints = {
                 @UniqueConstraint(columnNames = {"event_id", "mission_id", "user_id"})
         }
 )
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Participation {
 
     @Id

@@ -1,6 +1,6 @@
 package com.sincheon90.eventparticipation.service;
 
-import com.sincheon90.eventparticipation.domain.Participation;
+import com.sincheon90.eventparticipation.domain.participation.Participation;
 import com.sincheon90.eventparticipation.dto.ParticipationRequest;
 import com.sincheon90.eventparticipation.dto.ParticipationResponse;
 import jakarta.transaction.Transactional;
