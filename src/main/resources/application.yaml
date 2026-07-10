@@ -1,3 +1,13 @@
 spring:
   application:
     name: event-participation-system
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/event_participation
+    username: app
+    password: app
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
