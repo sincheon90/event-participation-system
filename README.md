@@ -290,3 +290,42 @@ point_histories への保存
   "occurredAt": "2026-07-05T12:00:05"
 }
 ```
+
+
+---
+
+## ローカル環境の起動
+
+本プロジェクトでは、ローカル開発環境のMySQLをDocker Composeで構築します。
+
+### MySQLの起動
+
+```bash
+docker compose up -d
+```
+
+コンテナの起動状態を確認します。
+
+```bash
+docker compose ps
+```
+
+### アプリケーションの起動
+
+MySQLコンテナの起動後、Spring Bootアプリケーションを実行します。
+
+```bash
+./gradlew bootRun
+```
+
+### 環境の停止
+
+```bash
+docker compose down
+```
+
+データを含むVolumeも削除する場合は、以下を実行します。
+
+```bash
+docker compose down -v
+```
