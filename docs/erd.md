@@ -9,7 +9,7 @@ users
 events
 missions
 participations
-notification_logs
+participation_result_logs
 event_statistics
 point_histories
 user_points
@@ -19,7 +19,7 @@ user_points
 
 `participations` は、ユーザーがどのイベントのどのミッションに参加したかを保存するテーブルであり、参加状態の最終的な正本として扱います。
 
-また、参加完了後の付随処理として、通知処理履歴、統計集計、ポイント履歴、ユーザー別ポイント残高を管理します。
+また、参加完了後の付随処理として、応答結果履歴、統計集計、ポイント履歴、ユーザー別ポイント残高を管理します。
 
 
 ---
@@ -30,22 +30,22 @@ user_points
 erDiagram
 
     users ||--o{ participations : ""
-    users ||--o{ notification_logs : ""
+    users ||--o{ participation_result_logs : ""
     users ||--o{ point_histories : ""
     users ||--o| user_points : ""
 
     events ||--o{ missions : ""
     events ||--o{ participations : ""
-    events ||--o{ notification_logs : ""
+    events ||--o{ participation_result_logs : ""
     events ||--|| event_statistics : ""
     events ||--o{ point_histories : ""
 
     missions ||--o{ participations : ""
-    missions ||--o{ notification_logs : ""
+    missions ||--o{ participation_result_logs : ""
     missions ||--|| event_statistics : ""
     missions ||--o{ point_histories : ""
 
-    participations ||--o{ notification_logs : ""
+    participations ||--o{ participation_result_logs : ""
 
 
     users {
@@ -79,13 +79,13 @@ erDiagram
         datetime created_at
     }
 
-    notification_logs {
+    participation_result_logs {
         bigint id PK
         bigint participation_id FK
         bigint user_id
         bigint event_id
         bigint mission_id
-        varchar notification_type
+        varchar participation_result_type
         varchar status
         varchar message
         datetime processed_at

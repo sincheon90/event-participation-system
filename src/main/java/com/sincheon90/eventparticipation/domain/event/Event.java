@@ -2,6 +2,7 @@ package com.sincheon90.eventparticipation.domain.event;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -28,6 +29,7 @@ public class Event {
 
     private LocalDateTime createdAt;
 
+    @Builder
     public Event(String title, String description, LocalDateTime startAt, LocalDateTime endAt) {
         this.title = title;
         this.description = description;

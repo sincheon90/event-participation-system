@@ -1,7 +1,7 @@
 package com.sincheon90.eventparticipation.api;
 
-import com.sincheon90.eventparticipation.dto.ParticipationRequest;
-import com.sincheon90.eventparticipation.dto.ParticipationResponse;
+import com.sincheon90.eventparticipation.api.dto.ParticipationRequest;
+import com.sincheon90.eventparticipation.api.dto.ParticipationResponse;
 import com.sincheon90.eventparticipation.service.ParticipationService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;

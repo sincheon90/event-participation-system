@@ -1,8 +1,8 @@
 package com.sincheon90.eventparticipation.service;
 
 import com.sincheon90.eventparticipation.domain.participation.Participation;
-import com.sincheon90.eventparticipation.dto.ParticipationRequest;
-import com.sincheon90.eventparticipation.dto.ParticipationResponse;
+import com.sincheon90.eventparticipation.api.dto.ParticipationRequest;
+import com.sincheon90.eventparticipation.api.dto.ParticipationResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

@@ -58,7 +58,7 @@ API レスポンス返却
 対象処理:
 
 ```text
-notification_logs への保存
+participation_result_logs への保存
 event_statistics の更新
 point_histories へのポイント付与履歴保存
 ```
@@ -100,7 +100,7 @@ MySQL Unique Constraint
 [Kafka Consumer]
         |
         | 非同期後続処理
-        | 1. notification_logs へ通知処理履歴を保存
+        | 1. participation_result_logs へ応答結果履歴を保存
         | 2. event_statistics 更新
         | 3. point_histories 保存
         v
@@ -128,13 +128,13 @@ MySQL Unique Constraint
 
 ## API 一覧
 
-| Method | Endpoint | Description |
-|---|---|---|
-| POST | `/api/events` | イベント作成 |
-| POST | `/api/events/{eventId}/missions` | ミッション作成 |
+| Method | Endpoint                                                 | Description |
+|---|----------------------------------------------------------|---|
+| POST | `/api/events`                                            | イベント作成 |
+| POST | `/api/events/{eventId}/missions`                         | ミッション作成 |
 | POST | `/api/events/{eventId}/missions/{missionId}/participate` | イベント参加 |
-| GET | `/api/events/{eventId}/stats` | イベント統計照会 |
-| GET | `/api/events/{eventId}/notification-logs` | 通知処理履歴照会 |
+| GET | `/api/events/{eventId}/stats`                            | イベント統計照会 |
+| GET | `/api/events/{eventId}/participation-result-logs`        | 応答結果履歴照会 |
 
 ---
 
@@ -149,7 +149,7 @@ users
 events
 missions
 participations
-notification_logs
+participation_result_logs
 event_statistics
 point_histories
 ```
@@ -239,7 +239,7 @@ DB Unique 制約による重複検出
 今後の拡張:
 
 ```text
-notification_logs への通知処理履歴保存
+participation_result_logs への応答結果履歴保存
 event_statistics の更新
 point_histories への保存
 ```

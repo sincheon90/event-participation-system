@@ -1,7 +1,5 @@
-package com.sincheon90.eventparticipation.domain;
+package com.sincheon90.eventparticipation.domain.participation;
 
-import com.sincheon90.eventparticipation.domain.participation.Participation;
-import com.sincheon90.eventparticipation.domain.participation.ParticipationRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

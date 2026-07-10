@@ -1,9 +1,10 @@
-package com.sincheon90.eventparticipation.domain.notification;
+package com.sincheon90.eventparticipation.domain.participation;
 
 import jakarta.persistence.Enumerated;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -11,9 +12,9 @@ import java.time.LocalDateTime;
 
 @Getter
 @Entity
-@Table(name = "notification_logs")
+@Table(name = "participation_result_logs")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class NotificationLog {
+public class ParticipationResultLog {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,36 +28,37 @@ public class NotificationLog {
 
     private Long missionId;
 
-    private String notificationType;
+    private String resultType;
 
     @Enumerated(EnumType.STRING)
-    private NotificationStatus status;
+    private ParticipationResultStatus status;
 
     @Column(columnDefinition = "TEXT")
     private String message;
 
-    private LocalDateTime processedAt;
+    private LocalDateTime createdAt;
 
-    public NotificationLog(
+    @Builder
+    public ParticipationResultLog(
             Long participationId,
             Long userId,
             Long eventId,
             Long missionId,
-            String notificationType,
-            NotificationStatus status,
+            String resultType,
+            ParticipationResultStatus status,
             String message
     ) {
         this.participationId = participationId;
         this.userId = userId;
         this.eventId = eventId;
         this.missionId = missionId;
-        this.notificationType = notificationType;
+        this.resultType = resultType;
         this.status = status;
         this.message = message;
     }
 
     @PrePersist
     public void prePersist() {
-        this.processedAt = LocalDateTime.now();
+        this.createdAt = LocalDateTime.now();
     }
 }

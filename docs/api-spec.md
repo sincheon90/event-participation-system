@@ -8,19 +8,19 @@
 
 対象 API は以下です。
 
-| Method | Endpoint | Description |
-|---|---|---|
-| POST | `/api/events` | イベント作成 |
-| GET | `/api/events` | イベント一覧照会 |
-| GET | `/api/events/{eventId}` | イベント詳細照会 |
-| POST | `/api/events/{eventId}/missions` | ミッション作成 |
-| GET | `/api/events/{eventId}/missions` | ミッション一覧照会 |
-| GET | `/api/events/{eventId}/missions/{missionId}` | ミッション詳細照会|
+| Method | Endpoint                                                 | Description |
+|---|----------------------------------------------------------|---|
+| POST | `/api/events`                                            | イベント作成 |
+| GET | `/api/events`                                            | イベント一覧照会 |
+| GET | `/api/events/{eventId}`                                  | イベント詳細照会 |
+| POST | `/api/events/{eventId}/missions`                         | ミッション作成 |
+| GET | `/api/events/{eventId}/missions`                         | ミッション一覧照会 |
+| GET | `/api/events/{eventId}/missions/{missionId}`             | ミッション詳細照会|
 | POST | `/api/events/{eventId}/missions/{missionId}/participate` | イベント参加 |
-| GET | `/api/events/{eventId}/stats` | イベント統計照会 |
-| GET | `/api/events/{eventId}/notification-logs` | 通知処理履歴照会 |
-| GET | `/api/users/{userId}/points` | ユーザー現在ポイント照会 |
-| GET | `/api/users/{userId}/point-histories` | ユーザーポイント履歴照会 |
+| GET | `/api/events/{eventId}/stats`                            | イベント統計照会 |
+| GET | `/api/events/{eventId}/participation-result-logs`        | 応答結果履歴照会 |
+| GET | `/api/users/{userId}/points`                             | ユーザー現在ポイント照会 |
+| GET | `/api/users/{userId}/point-histories`                    | ユーザーポイント履歴照会 |
 
 ---
 

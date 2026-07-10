@@ -1,4 +1,4 @@
-package com.sincheon90.eventparticipation.dto;
+package com.sincheon90.eventparticipation.api.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;

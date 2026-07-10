@@ -2,6 +2,7 @@ package com.sincheon90.eventparticipation.domain.user;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -21,6 +22,7 @@ public class User {
 
     private LocalDateTime createdAt;
 
+    @Builder
     public User(String name) {
         this.name = name;
     }
