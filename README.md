@@ -128,6 +128,8 @@ MySQL Unique Constraint
 
 ## API 一覧
 
+API の詳細なリクエスト・レスポンス仕様は [docs/api-spec.md](docs/api-spec.md) を参照してください。
+
 | Method | Endpoint                                                 | Description |
 |---|----------------------------------------------------------|---|
 | POST | `/api/events`                                            | イベント作成 |
