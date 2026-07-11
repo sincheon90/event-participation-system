@@ -7,6 +7,7 @@ import com.sincheon90.eventparticipation.domain.event.MissionRepository;
 import com.sincheon90.eventparticipation.domain.participation.Participation;
 import com.sincheon90.eventparticipation.domain.participation.ParticipationRepository;
 import com.sincheon90.eventparticipation.domain.user.UserRepository;
+import com.sincheon90.eventparticipation.redis.ParticipationRedisService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -23,6 +24,8 @@ public class ParticipationService {
     private final UserRepository userRepository;
 
     private final ParticipationRepository participationRepository;
+
+    private final ParticipationRedisService participationRedisService;
 
     @Transactional
     public ParticipationResponse participate(Long eventId, Long missionId, ParticipationRequest request) {
@@ -50,6 +53,9 @@ public class ParticipationService {
         }
 
         // Redisによる重複確認
+        if (!participationRedisService.tryLock(eventId, missionId, userId)) {
+            return ParticipationResponse.duplicate();
+        }
 
         // 参加データを生成する
         Participation participation = Participation.builder()

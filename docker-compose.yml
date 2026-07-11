@@ -15,5 +15,12 @@ services:
     volumes:
       - mysql-data:/var/lib/mysql
 
+  redis:
+    image: redis:7-alpine
+    container_name: event-participation-redis
+    ports:
+      - "6379:6379"
+
 volumes:
   mysql-data:
+  redis-data:
