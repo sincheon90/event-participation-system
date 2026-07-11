@@ -2,6 +2,7 @@ package com.sincheon90.eventparticipation.domain.participation;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -34,6 +35,7 @@ public class Participation {
     private LocalDateTime createdAt;
 
 
+    @Builder
     public Participation(Long userId, Long eventId, Long missionId) {
         this.userId = userId;
         this.eventId = eventId;
