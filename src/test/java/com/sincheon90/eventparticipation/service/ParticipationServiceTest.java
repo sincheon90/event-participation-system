@@ -7,6 +7,9 @@ import com.sincheon90.eventparticipation.domain.event.MissionRepository;
 import com.sincheon90.eventparticipation.domain.participation.Participation;
 import com.sincheon90.eventparticipation.domain.participation.ParticipationRepository;
 import com.sincheon90.eventparticipation.domain.user.UserRepository;
+import com.sincheon90.eventparticipation.kafka.ParticipationResultEvent;
+import com.sincheon90.eventparticipation.kafka.producer.ParticipationEventProducer;
+import com.sincheon90.eventparticipation.redis.ParticipationRedisService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,12 +24,15 @@ import org.springframework.test.util.ReflectionTestUtils;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ParticipationServiceTest {
+
+    private static final Long EVENT_ID = 1L;
+    private static final Long MISSION_ID = 10L;
+    private static final Long USER_ID = 100L;
+    private static final Long PARTICIPATION_ID = 1L;
 
     @Mock
     private EventRepository eventRepository;
@@ -40,6 +46,12 @@ class ParticipationServiceTest {
     @Mock
     private ParticipationRepository participationRepository;
 
+    @Mock
+    private ParticipationRedisService participationRedisService;
+
+    @Mock
+    private ParticipationEventProducer participationEventProducer;
+
     @InjectMocks
     private ParticipationService participationService;
 
@@ -52,79 +64,170 @@ class ParticipationServiceTest {
     }
 
     @Test
-    @DisplayName("イベントが存在しない場合、NOT_FOUNDを返す")
+    @DisplayName("イベントが存在しない場合、NOT_FOUNDを返してKafkaに結果を送信する")
     void eventNotFound() {
         // given
-        given(eventRepository.existsById(1L))
+        given(eventRepository.existsById(EVENT_ID))
                 .willReturn(false);
+
+        ArgumentCaptor<ParticipationResultEvent> eventCaptor =
+                ArgumentCaptor.forClass(ParticipationResultEvent.class);
 
         // when
         ParticipationResponse response =
-                participationService.participate(1L, 10L, request);
+                participationService.participate(
+                        EVENT_ID,
+                        MISSION_ID,
+                        request
+                );
 
         // then
         assertThat(response.getStatus().name())
                 .isEqualTo("NOT_FOUND");
+
         assertThat(response.getMessage())
                 .isEqualTo("Event not found");
+
+        verify(participationEventProducer)
+                .send(eventCaptor.capture());
+
+        ParticipationResultEvent sentEvent =
+                eventCaptor.getValue();
+
+        assertThat(sentEvent.participationId())
+                .isNull();
+
+        assertThat(sentEvent.eventId())
+                .isEqualTo(EVENT_ID);
+
+        assertThat(sentEvent.missionId())
+                .isEqualTo(MISSION_ID);
+
+        assertThat(sentEvent.userId())
+                .isEqualTo(USER_ID);
+
+        assertThat(sentEvent.resultStatus().name())
+                .isEqualTo("NOT_FOUND");
+
+        assertThat(sentEvent.message())
+                .isEqualTo("Event not found");
+
+        assertThat(sentEvent.occurredAt())
+                .isNotNull();
 
         verifyNoInteractions(
                 missionRepository,
                 userRepository,
+                participationRedisService,
                 participationRepository
         );
     }
 
     @Test
-    @DisplayName("対象イベントにミッションが存在しない場合、NOT_FOUNDを返す")
+    @DisplayName("対象イベントにミッションが存在しない場合、NOT_FOUNDを返してKafkaに結果を送信する")
     void missionNotFound() {
         // given
-        given(eventRepository.existsById(1L))
+        given(eventRepository.existsById(EVENT_ID))
                 .willReturn(true);
 
-        given(missionRepository.existsByIdAndEventId(10L, 1L))
-                .willReturn(false);
+        given(missionRepository.existsByIdAndEventId(
+                MISSION_ID,
+                EVENT_ID
+        )).willReturn(false);
+
+        ArgumentCaptor<ParticipationResultEvent> eventCaptor =
+                ArgumentCaptor.forClass(ParticipationResultEvent.class);
 
         // when
         ParticipationResponse response =
-                participationService.participate(1L, 10L, request);
+                participationService.participate(
+                        EVENT_ID,
+                        MISSION_ID,
+                        request
+                );
 
         // then
         assertThat(response.getStatus().name())
                 .isEqualTo("NOT_FOUND");
+
         assertThat(response.getMessage())
+                .isEqualTo("Mission not found");
+
+        verify(participationEventProducer)
+                .send(eventCaptor.capture());
+
+        ParticipationResultEvent sentEvent =
+                eventCaptor.getValue();
+
+        assertThat(sentEvent.participationId())
+                .isNull();
+
+        assertThat(sentEvent.resultStatus().name())
+                .isEqualTo("NOT_FOUND");
+
+        assertThat(sentEvent.message())
                 .isEqualTo("Mission not found");
 
         verifyNoInteractions(
                 userRepository,
+                participationRedisService,
                 participationRepository
         );
     }
 
     @Test
-    @DisplayName("ユーザーが存在しない場合、NOT_FOUNDを返す")
+    @DisplayName("ユーザーが存在しない場合、NOT_FOUNDを返してKafkaに結果を送信する")
     void userNotFound() {
         // given
-        given(eventRepository.existsById(1L))
+        given(eventRepository.existsById(EVENT_ID))
                 .willReturn(true);
 
-        given(missionRepository.existsByIdAndEventId(10L, 1L))
-                .willReturn(true);
+        given(missionRepository.existsByIdAndEventId(
+                MISSION_ID,
+                EVENT_ID
+        )).willReturn(true);
 
-        given(userRepository.existsById(100L))
+        given(userRepository.existsById(USER_ID))
                 .willReturn(false);
+
+        ArgumentCaptor<ParticipationResultEvent> eventCaptor =
+                ArgumentCaptor.forClass(ParticipationResultEvent.class);
 
         // when
         ParticipationResponse response =
-                participationService.participate(1L, 10L, request);
+                participationService.participate(
+                        EVENT_ID,
+                        MISSION_ID,
+                        request
+                );
 
         // then
         assertThat(response.getStatus().name())
                 .isEqualTo("NOT_FOUND");
+
         assertThat(response.getMessage())
                 .isEqualTo("User not found");
 
-        // ユーザーが存在しない場合、参加情報が保存されないことを確認する
+        verify(participationEventProducer)
+                .send(eventCaptor.capture());
+
+        ParticipationResultEvent sentEvent =
+                eventCaptor.getValue();
+
+        assertThat(sentEvent.participationId())
+                .isNull();
+
+        assertThat(sentEvent.resultStatus().name())
+                .isEqualTo("NOT_FOUND");
+
+        assertThat(sentEvent.message())
+                .isEqualTo("User not found");
+
+        verify(
+                participationRedisService,
+                never()
+        ).tryLock(any(), any(), any());
+
         verify(
                 participationRepository,
                 never()
@@ -132,73 +235,189 @@ class ParticipationServiceTest {
     }
 
     @Test
-    @DisplayName("すべての対象が存在する場合、参加情報を保存してSUCCESSを返す")
+    @DisplayName("Redisで重複と判断された場合、DUPLICATEを返してKafkaに結果を送信する")
+    void duplicateByRedis() {
+        // given
+        given(eventRepository.existsById(EVENT_ID))
+                .willReturn(true);
+
+        given(missionRepository.existsByIdAndEventId(
+                MISSION_ID,
+                EVENT_ID
+        )).willReturn(true);
+
+        given(userRepository.existsById(USER_ID))
+                .willReturn(true);
+
+        given(participationRedisService.tryLock(
+                EVENT_ID,
+                MISSION_ID,
+                USER_ID
+        )).willReturn(false);
+
+        ArgumentCaptor<ParticipationResultEvent> eventCaptor =
+                ArgumentCaptor.forClass(ParticipationResultEvent.class);
+
+        // when
+        ParticipationResponse response =
+                participationService.participate(
+                        EVENT_ID,
+                        MISSION_ID,
+                        request
+                );
+
+        // then
+        assertThat(response.getParticipationId())
+                .isNull();
+
+        assertThat(response.getStatus().name())
+                .isEqualTo("DUPLICATE");
+
+        assertThat(response.getMessage())
+                .isEqualTo(
+                        "User already participated in this mission"
+                );
+
+        verify(participationEventProducer)
+                .send(eventCaptor.capture());
+
+        ParticipationResultEvent sentEvent =
+                eventCaptor.getValue();
+
+        assertThat(sentEvent.participationId())
+                .isNull();
+
+        assertThat(sentEvent.resultStatus().name())
+                .isEqualTo("DUPLICATE");
+
+        verify(
+                participationRepository,
+                never()
+        ).saveAndFlush(any());
+    }
+
+    @Test
+    @DisplayName("すべての対象が存在する場合、参加情報を保存してSUCCESS結果をKafkaに送信する")
     void participationSuccess() {
         // given
-        given(eventRepository.existsById(1L))
+        given(eventRepository.existsById(EVENT_ID))
                 .willReturn(true);
 
-        given(missionRepository.existsByIdAndEventId(10L, 1L))
+        given(missionRepository.existsByIdAndEventId(
+                MISSION_ID,
+                EVENT_ID
+        )).willReturn(true);
+
+        given(userRepository.existsById(USER_ID))
                 .willReturn(true);
 
-        given(userRepository.existsById(100L))
-                .willReturn(true);
+        given(participationRedisService.tryLock(
+                EVENT_ID,
+                MISSION_ID,
+                USER_ID
+        )).willReturn(true);
 
         given(participationRepository.saveAndFlush(
                 any(Participation.class)
         )).willAnswer(invocation -> {
             Participation participation = invocation.getArgument(0);
 
-            // JPAが保存時にIDを設定する動作を再現する
             ReflectionTestUtils.setField(
                     participation,
                     "id",
-                    1L
+                    PARTICIPATION_ID
             );
 
             return participation;
         });
 
+        ArgumentCaptor<Participation> participationCaptor =
+                ArgumentCaptor.forClass(Participation.class);
+
+        ArgumentCaptor<ParticipationResultEvent> eventCaptor =
+                ArgumentCaptor.forClass(ParticipationResultEvent.class);
+
         // when
         ParticipationResponse response =
-                participationService.participate(1L, 10L, request);
+                participationService.participate(
+                        EVENT_ID,
+                        MISSION_ID,
+                        request
+                );
 
         // then
         assertThat(response.getParticipationId())
-                .isEqualTo(1L);
+                .isEqualTo(PARTICIPATION_ID);
+
         assertThat(response.getStatus().name())
                 .isEqualTo("SUCCESS");
+
         assertThat(response.getMessage())
                 .isEqualTo("Participation completed");
 
-        ArgumentCaptor<Participation> captor =
-                ArgumentCaptor.forClass(Participation.class);
-
         verify(participationRepository)
-                .saveAndFlush(captor.capture());
+                .saveAndFlush(participationCaptor.capture());
 
-        Participation savedParticipation = captor.getValue();
+        Participation savedParticipation =
+                participationCaptor.getValue();
 
         assertThat(savedParticipation.getEventId())
-                .isEqualTo(1L);
+                .isEqualTo(EVENT_ID);
+
         assertThat(savedParticipation.getMissionId())
-                .isEqualTo(10L);
+                .isEqualTo(MISSION_ID);
+
         assertThat(savedParticipation.getUserId())
-                .isEqualTo(100L);
+                .isEqualTo(USER_ID);
+
+        verify(participationEventProducer)
+                .send(eventCaptor.capture());
+
+        ParticipationResultEvent sentEvent =
+                eventCaptor.getValue();
+
+        assertThat(sentEvent.participationId())
+                .isEqualTo(PARTICIPATION_ID);
+
+        assertThat(sentEvent.eventId())
+                .isEqualTo(EVENT_ID);
+
+        assertThat(sentEvent.missionId())
+                .isEqualTo(MISSION_ID);
+
+        assertThat(sentEvent.userId())
+                .isEqualTo(USER_ID);
+
+        assertThat(sentEvent.resultStatus().name())
+                .isEqualTo("SUCCESS");
+
+        assertThat(sentEvent.message())
+                .isEqualTo("Participation completed");
+
+        assertThat(sentEvent.occurredAt())
+                .isNotNull();
     }
 
     @Test
-    @DisplayName("DBのUnique制約に違反した場合、DUPLICATEを返す")
+    @DisplayName("DBのUnique制約に違反した場合、DUPLICATE結果をKafkaに送信する")
     void duplicateParticipation() {
         // given
-        given(eventRepository.existsById(1L))
+        given(eventRepository.existsById(EVENT_ID))
                 .willReturn(true);
 
-        given(missionRepository.existsByIdAndEventId(10L, 1L))
+        given(missionRepository.existsByIdAndEventId(
+                MISSION_ID,
+                EVENT_ID
+        )).willReturn(true);
+
+        given(userRepository.existsById(USER_ID))
                 .willReturn(true);
 
-        given(userRepository.existsById(100L))
-                .willReturn(true);
+        given(participationRedisService.tryLock(
+                EVENT_ID,
+                MISSION_ID,
+                USER_ID
+        )).willReturn(true);
 
         given(participationRepository.saveAndFlush(
                 any(Participation.class)
@@ -208,16 +427,51 @@ class ParticipationServiceTest {
                 )
         );
 
+        ArgumentCaptor<ParticipationResultEvent> eventCaptor =
+                ArgumentCaptor.forClass(ParticipationResultEvent.class);
+
         // when
         ParticipationResponse response =
-                participationService.participate(1L, 10L, request);
+                participationService.participate(
+                        EVENT_ID,
+                        MISSION_ID,
+                        request
+                );
 
         // then
         assertThat(response.getParticipationId())
                 .isNull();
+
         assertThat(response.getStatus().name())
                 .isEqualTo("DUPLICATE");
+
         assertThat(response.getMessage())
+                .isEqualTo(
+                        "User already participated in this mission"
+                );
+
+        verify(participationEventProducer)
+                .send(eventCaptor.capture());
+
+        ParticipationResultEvent sentEvent =
+                eventCaptor.getValue();
+
+        assertThat(sentEvent.participationId())
+                .isNull();
+
+        assertThat(sentEvent.eventId())
+                .isEqualTo(EVENT_ID);
+
+        assertThat(sentEvent.missionId())
+                .isEqualTo(MISSION_ID);
+
+        assertThat(sentEvent.userId())
+                .isEqualTo(USER_ID);
+
+        assertThat(sentEvent.resultStatus().name())
+                .isEqualTo("DUPLICATE");
+
+        assertThat(sentEvent.message())
                 .isEqualTo(
                         "User already participated in this mission"
                 );

@@ -7,11 +7,15 @@ import com.sincheon90.eventparticipation.domain.event.MissionRepository;
 import com.sincheon90.eventparticipation.domain.participation.Participation;
 import com.sincheon90.eventparticipation.domain.participation.ParticipationRepository;
 import com.sincheon90.eventparticipation.domain.user.UserRepository;
+import com.sincheon90.eventparticipation.kafka.ParticipationResultEvent;
+import com.sincheon90.eventparticipation.kafka.producer.ParticipationEventProducer;
 import com.sincheon90.eventparticipation.redis.ParticipationRedisService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -27,11 +31,26 @@ public class ParticipationService {
 
     private final ParticipationRedisService participationRedisService;
 
+    private final ParticipationEventProducer participationEventProducer;
+
     @Transactional
     public ParticipationResponse participate(Long eventId, Long missionId, ParticipationRequest request) {
-        ParticipationResponse result = process(eventId, missionId, request.getUserId());
+        Long userId = request.getUserId();
+
+        ParticipationResponse result = process(eventId, missionId, userId);
 
         // Kafkaへ参加結果を非同期送信する
+        ParticipationResultEvent eventMessage = new ParticipationResultEvent(
+                result.getParticipationId(),
+                eventId,
+                missionId,
+                userId,
+                result.getStatus(),
+                result.getMessage(),
+                LocalDateTime.now()
+        );
+
+        participationEventProducer.send(eventMessage);
 
         return result;
     }
