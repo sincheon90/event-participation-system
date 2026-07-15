@@ -36,6 +36,8 @@ public class ParticipationResultLog {
     @Column(columnDefinition = "TEXT")
     private String message;
 
+    private LocalDateTime eventCreatedAt;
+
     private LocalDateTime createdAt;
 
     @Builder
@@ -46,7 +48,8 @@ public class ParticipationResultLog {
             Long missionId,
             String resultType,
             ParticipationResultStatus status,
-            String message
+            String message,
+            LocalDateTime eventCreatedAt
     ) {
         this.participationId = participationId;
         this.userId = userId;
@@ -55,6 +58,7 @@ public class ParticipationResultLog {
         this.resultType = resultType;
         this.status = status;
         this.message = message;
+        this.eventCreatedAt = eventCreatedAt;
     }
 
     @PrePersist

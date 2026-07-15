@@ -35,3 +35,14 @@ out/
 
 ### VS Code ###
 .vscode/
+
+load-test/results/*
+!load-test/results/.gitkeep
+!load-test/results/api-statistics.csv
+!load-test/results/async-statistics.csv
+!load-test/results/*-report/
+load-test/results/*-report/*
+!load-test/results/*-report/statistics.json
+jmeter.log
+
+*.bk

@@ -31,6 +31,7 @@ public class ParticipationResultEventHandler {
                 .userId(event.userId())
                 .status(event.resultStatus())
                 .message(event.message())
+                .eventCreatedAt(event.occurredAt())
                 .build();
 
 

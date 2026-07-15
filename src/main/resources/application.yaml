@@ -12,6 +12,10 @@ spring:
       ddl-auto: update
     show-sql: true
 
+  sql:
+    init:
+      mode: never
+
   data:
     redis:
       host: localhost

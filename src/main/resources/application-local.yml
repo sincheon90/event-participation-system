@@ -1,3 +1,7 @@
 spring:
   main:
     web-application-type: servlet
+
+  sql:
+    init:
+      mode: never

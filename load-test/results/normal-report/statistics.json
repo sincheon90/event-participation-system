@@ -1,0 +1,34 @@
+{
+  "POST Participate" : {
+    "transaction" : "POST Participate",
+    "sampleCount" : 10000,
+    "errorCount" : 0,
+    "errorPct" : 0.0,
+    "meanResTime" : 9.358099999999997,
+    "medianResTime" : 5.0,
+    "minResTime" : 1.0,
+    "maxResTime" : 807.0,
+    "pct1ResTime" : 23.0,
+    "pct2ResTime" : 31.0,
+    "pct3ResTime" : 45.0,
+    "throughput" : 337.0635027639207,
+    "receivedKBytesPerSec" : 83.51209109983822,
+    "sentKBytesPerSec" : 90.483578160813
+  },
+  "Total" : {
+    "transaction" : "Total",
+    "sampleCount" : 10000,
+    "errorCount" : 0,
+    "errorPct" : 0.0,
+    "meanResTime" : 9.358099999999997,
+    "medianResTime" : 5.0,
+    "minResTime" : 1.0,
+    "maxResTime" : 807.0,
+    "pct1ResTime" : 23.0,
+    "pct2ResTime" : 31.0,
+    "pct3ResTime" : 45.0,
+    "throughput" : 337.0635027639207,
+    "receivedKBytesPerSec" : 83.51209109983822,
+    "sentKBytesPerSec" : 90.483578160813
+  }
+}
